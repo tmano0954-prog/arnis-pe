@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARNIS Pocket Edition - Real World Minecraft Map Generator</title>
+    
+    <!-- 1. THIS IS THE REPLACEMENT LINK FOR YOUR CSS FILE -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="generator-panel">
+    <h1>ARNIS Pocket Edition</h1>
+    <div class="subtitle">Faithful Cleanliness Map Generator</div>
+
+    <!-- Step 1: Location Input -->
+    <div class="step-box">
+        <label for="location">📍 Step 1: Target Location (Google Maps)</label>
+        <input type="text" id="location" placeholder="e.g., Saipan, Tumon Bay, Downtown Orlando...">
+    </div>
+
+    <!-- Step 2: Timeline Slider -->
+    <div class="step-box">
+        <label for="timeline">⏳ Step 2: Google Maps Timeline</label>
+        <input type="range" id="timeline" min="2007" max="2026" value="2007" oninput="updateTimelineDisplay(this.value)">
+        <div class="timeline-output" id="yearDisplay">2007 (Blurry Nostalgia Mode)</div>
+    </div>
+
+    <!-- Step 3: Minecraft Version Selector -->
+    <div class="step-box">
+        <label for="version">🎮 Step 3: Minecraft Target Version</label>
+        <select id="version" onchange="adjustLimits(this.value)">
+            <option value="classic">Classic Era (0.28 - 0.30) [Strict 128x128 Limit]</option>
+            <option value="legacy-pe">Alpha/Beta Pocket Edition (0.1.0 - 0.10.0)</option>
+            <option value="golden-pe" selected>Golden Age PE (0.14.0 - 1.0 Release)</option>
+            <option value="custom">Your Custom Version</option>
+        </select>
+    </div>
+
+    <!-- Step 4: Dimension Control -->
+    <div class="step-box">
+        <label>📐 Step 4: Portion Dimensions (Max 1,099 x 3,097)</label>
+        <div class="dimension-group">
+            <input type="number" id="width" placeholder="Width (Max 1099)" max="1099" value="1099">
+            <input type="number" id="length" placeholder="Length (Max 3097)" max="3097" value="3097">
+        </div>
+    </div>
+
+    <!-- Step 5: Export Button -->
+    <button class="btn-generate" onclick="startGeneration()">⚡ Export World File</button>
+</div>
+
+<!-- 2. THIS IS THE REPLACEMENT LINK FOR YOUR JAVASCRIPT FILE -->
+<script src="app.js"></script>
+
+</body>
+</html>

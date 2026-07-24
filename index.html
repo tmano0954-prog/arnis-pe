@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARNIS Pocket Edition - Real World Minecraft Map Generator</title>
+    <style>
+        /* ==========================================================================
+           STYLE SHEET (Formerly style.css)
+           ========================================================================== */
+        :root {
+            --bg-color: #0c0c0e;
+            --container-bg: #16161a;
+            --accent-color: #388e3c; /* Faithful Grass Green */
+            --accent-hover: #2e7d32;
+            --text-color: #f5f5f7;
+            --text-muted: #8e8e93;
+            --border-color: #2c2c2e;
+            --input-bg: #1c1c1e;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .generator-panel {
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 32px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            color: var(--accent-color);
+            text-align: center;
+            margin: 0 0 4px 0;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 32px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .step-box {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        input[type="text"], 
+        input[type="number"], 
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 15px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus, 
+        input[type="number"]:focus, 
+        select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(56, 142, 60, 0.2);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            margin: 12px 0;
+            accent-color: var(--accent-color);
+        }
+
+        .timeline-output {
+            text-align: center;
+            font-weight: 600;
+            color: var(--accent-color);
+            font-size: 14px;
+        }
+
+        .dimension-group {
+            display: flex;
+            gap: 12px;
+        }
+
+        .dimension-group input {
+            text-align: center;
+        }
+
+        .btn-generate {
+            width: 100%;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn-generate:hover {
+            background-color: var(--accent-hover);
+        }
+
+        .btn-generate:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+
+<div class="generator-panel">
+    <h1>ARNIS Pocket Edition</h1>
+    <div class="subtitle">Faithful Cleanliness Map Generator</div>
+
+    <!-- Step 1: Location Input -->
+    <div class="step-box">
+        <label for="location">📍 Step 1: Target Location (Google Maps)</label>
+        <input type="text" id="location" placeholder="e.g., Saipan, Tumon Bay, Downtown Orlando...">
+    </div>
+
+    <!-- Step 2: Timeline Slider -->
+    <div class="step-box">
+        <label for="timeline">⏳ Step 2: Google Maps Timeline</label>
+        <input type="range" id="timeline" min="2007" max="2026" value="2007" oninput="updateTimelineDisplay(this.value)">
+        <div class="timeline-output" id="yearDisplay">2007 (Blurry Nostalgia Mode)</div>
+    </div>
+
+    <!-- Step 3: Minecraft Version Selector -->
+    <div class="step-box">
+        <label for="version">🎮 Step 3: Minecraft Target Version</label>
+        <select id="version" onchange="adjustLimits(this.value)">
+            <option value="classic">Classic Era (0.28 - 0.30) [Strict 128x128 Limit]</option>
+            <option value="legacy-pe">Alpha/Beta Pocket Edition (0.1.0 - 0.10.0)</option>
+            <option value="golden-pe" selected>Golden Age PE (0.14.0 - 1.0 Release)</option>
+            <option value="custom">Your Custom Version</option>
+        </select>
+    </div>
+
+    <!-- Step 4: Dimension Control -->
+    <div class="step-box">
+        <label>📐 Step 4: Portion Dimensions (Max 1,099 x 3,097)</label>
+        <div class="dimension-group">
+            <input type="number" id="width" placeholder="Width (Max 1099)" max="1099" value="1099">
+            <input type="number" id="length" placeholder="Length (Max 3097)" max="3097" value="3097">
+        </div>
+    </div>
+
+    <!-- Step 5: Export Button -->
+    <button class="btn-generate" onclick="startGeneration()">⚡ Export World File</button>
+</div>
+
+<script>
+    /* ==========================================================================
+       JAVASCRIPT APP LOGIC (Formerly app.js)
+       ========================================================================== */
+
+    /**
+     * Updates the text underneath the timeline slider to reflect the camera style.
+     */
+    function updateTimelineDisplay(year) {
+        const display = document.getElementById('yearDisplay');
+        if (year <= 2009) {
+            display.innerText = `${year} (Blurry Nostalgia Mode)`;
+        } else {
+            display.innerText = `${year} (HD Clarity Mode)`;
+        }
+    }
+
+    /**
+     * Automatically adjusts input rules and caps dimensions based on the chosen Minecraft version.
+     * Ensures strict constraints for Classic modes to protect game performance.
+     */
+    function adjustLimits(version) {
+        const widthInput = document.getElementById('width');
+        const lengthInput = document.getElementById('length');
+        
+        if (version === 'classic') {
+            // Enforce the strict historic 128x128 double slab / cloth canvas limits
+            widthInput.value = 128;
+            widthInput.max = 128;
+            widthInput.disabled = true;
+
+            lengthInput.value = 128;
+            lengthInput.max = 128;
+            lengthInput.disabled = true;
+            
+            console.log("Classic Mode locked: 128x128 boundaries enforced.");
+        } else {
+            // Restore standard boundaries for modern/advanced options
+            widthInput.disabled = false;
+            lengthInput.disabled = false;
+            widthInput.max = 1099;
+            lengthInput.max = 3097;
+            
+            // Reset defaults if previous values were stuck on old limits
+            if (widthInput.value == 128) widthInput.value = 1099;
+            if (lengthInput.value == 128) lengthInput.value = 3097;
+        }
+    }
+
+    /**
+     * Validates form fields and fires the block extraction sequence
+     */
+    function startGeneration() {
+        const location = document.getElementById('location').value.trim();
+        const year = document.getElementById('timeline').value;
+        const version = document.getElementById('version').value;
+        const width = parseInt(document.getElementById('width').value, 10);
+        const length = parseInt(document.getElementById('length').value, 10);
+
+        // Basic Form Protection
+        if (!location) {
+            alert("📍 Error: Please enter a target Google Maps region or street location to process.");
+            return;
+        }
+
+        // Input Constraint Checking
+        if (version !== 'classic') {
+            if (width > 1099 || length > 3097 || width < 1 || length < 1) {
+                alert("📐 Dimension Limit Blown: Keeping blocks within 1,099 x 3,097 guarantees mobile device stability.");
+                return;
+            }
+        }
+
+        // Format log metadata for testing
+        let logMessage = `Initializing Generation Loop:\n` +
+                         `• Target: ${location}\n` +
+                         `• Timeline Baseline: ${year}\n` +
+                         `• Engine: ${version.toUpperCase()}\n` +
+                         `• Scale Area: ${width}x${length} blocks`;
+
+        alert(logMessage);
+    }
+</script>
+
+</body>
+</html>
